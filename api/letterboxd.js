@@ -1,14 +1,15 @@
 const FEED_URL = "https://letterboxd.com/gordogg24p/rss/";
 
+// Letterboxd title format: "Film Title, Year - ★★★½"
 function extractTitle(rawTitle) {
-  // Letterboxd titles are formatted as "Film Title, by Director Name"
-  const match = rawTitle.match(/^(.+?),\s*by\s+.+$/);
+  const match = rawTitle.match(/^(.+?),\s*\d{4}/);
   return match ? match[1].trim() : rawTitle.trim();
 }
 
-function extractRating(description) {
-  const match = description.match(/[★½]+/);
-  return match ? match[0] : null;
+// Rating lives in the title field after " - "
+function extractRating(rawTitle) {
+  const match = rawTitle.match(/-\s*([★½]+)/);
+  return match ? match[1] : null;
 }
 
 export default async function handler(req, res) {
@@ -18,13 +19,13 @@ export default async function handler(req, res) {
   const items = [...xml.matchAll(/<item>([\s\S]*?)<\/item>/g)].slice(0, 3);
 
   const entries = items.map((item) => {
-    const rawTitle = item[1].match(/<title><!\[CDATA\[(.+?)\]\]><\/title>/) ||
+    const rawTitleMatch =
+      item[1].match(/<title><!\[CDATA\[(.+?)\]\]><\/title>/) ||
       item[1].match(/<title>(.+?)<\/title>/);
-    const descBlock = item[1].match(/<description><!\[CDATA\[([\s\S]*?)\]\]><\/description>/) ||
-      item[1].match(/<description>([\s\S]*?)<\/description>/);
 
-    const title = rawTitle ? extractTitle(rawTitle[1]) : "Unknown";
-    const rating = descBlock ? extractRating(descBlock[1]) : null;
+    const rawTitle = rawTitleMatch ? rawTitleMatch[1] : "Unknown";
+    const title = extractTitle(rawTitle);
+    const rating = extractRating(rawTitle);
 
     return rating ? `${title} ${rating}` : title;
   });
