@@ -1,0 +1,6 @@
+{
+  "rewrites": [
+    { "source": "/api/castme", "destination": "/api/castme" },
+    { "source": "/api/letterboxd", "destination": "/api/letterboxd" }
+  ]
+}

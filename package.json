@@ -1,0 +1,9 @@
+{
+  "name": "gordogg-bot",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Twitch chatbot API functions for StreamElements",
+  "engines": {
+    "node": ">=18"
+  }
+}
